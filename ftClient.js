@@ -1,4 +1,5 @@
 (function() {
+
     var _queryUrlHead = 'https://fusiontables.googleusercontent.com/fusiontables/api/query?sql=';
     var _queryUrlTail = '&jsonCallback=?';
 
@@ -11,21 +12,24 @@
 
         error = error || function() { throw "AJAX error!"; }
 
-        jQuery.ajax({
-            type: "GET",
-            url:  self.getQueryUrl(queryObject),
-            dataType: "jsonp",
-            success: success,
-            error: error
-        });
+        try {
+            jQuery.ajax({
+                type: "GET",
+                url:  self.queryUrl(queryObject),
+                dataType: "jsonp",
+                success: success,
+                error: error
+            });
+        } catch (e) {
+            throw "You must include jQuery to use ftClient!";
+        }
     }
 
     ftClient.queryUrl = function(queryObject) {
-        var self = this;
         var query = "";
 
         if (queryObject.select) {
-            query += "SELECT '" + queryObject.select.join("','") + "' FROM " + self.tableId;
+            query += "SELECT '" + queryObject.select.join("','") + "' FROM " + queryObject.from;
         }
 
         if (queryObject.where) {
@@ -46,4 +50,4 @@
 
         return encodeURI(_queryUrlHead + query + _queryUrlTail);
     }
-})
+})()
